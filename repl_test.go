@@ -17,6 +17,10 @@ func TestCleanInput(t *testing.T) {
 			input:    "Charmander Bulbasaur PIKACHU",
 			expected: []string{"charmander", "bulbasaur", "pikachu"},
 		},
+		{
+			input:    "",
+			expected: []string{""},
+		},
 	// add more cases here
 	}
 
