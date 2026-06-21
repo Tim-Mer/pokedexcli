@@ -43,6 +43,11 @@ func getCommands() map[string]cliCommand {
 			description: "Go back a page on the map",
 			callback:    backPage,
 		},
+		"explore": {
+			name:		"explore",
+			description: "Explore the current area and display the current available pokemon",
+			callback: 	commandExplore,
+		},
 	}
 	return list
 }
@@ -110,4 +115,8 @@ func backPage(config *Config) error {
 		config.CurrentPage -= 2
 	}
 	return commandMap(config)
+}
+
+func commandExplore(config *Config) error {
+	return nil
 }
