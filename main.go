@@ -28,6 +28,10 @@ func main() {
 		}
 		input := cleanInput(scanner.Text())
 		command := cli[input[0]].callback
+		if len(input) > 1 {
+			//add arguments so they can be passed to commands that require them
+			config.arguments = []byte(input[1])
+		}
 
 		if command == nil {
 			fmt.Println("Unknown command")

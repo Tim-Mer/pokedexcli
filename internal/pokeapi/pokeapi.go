@@ -77,7 +77,7 @@ func getFromURL(url string) (string, error) {
 	return fmt.Sprintf("%s", body), nil
 }
 
-func GetLocation(url string) ([]byte, error) {
+func getDetails(url string) (mapData, error) {
 	// Call the Get
 	data, err := getFromURL(url)
 	if err != nil {
@@ -88,8 +88,28 @@ func GetLocation(url string) ([]byte, error) {
 	dat := []byte(data)
 	err = json.Unmarshal(dat, &mapdata)
 	if err != nil {
+		return mapData{}, err
+	}
+	return mapdata, err
+}
+
+func GetLocation(url string) ([]byte, error) {
+	mapdata, err := getDetails(url)
+	if err != nil {
 		return []byte{}, err
 	}
 	//return the mapData Name variable which contains the name of the location
 	return []byte(mapdata.Name), nil
+}
+
+func ExploreLocation(url string) ([]byte, error) {
+	mapdata, err := getDetails(url)
+	if err != nil {
+		return []byte{}, err
+	}
+	var names []byte
+	for _, data := range mapdata.PokemonEncounters {
+		names = append(names, []byte(data.Pokemon.Name+"\n")...)
+	}
+	return names, nil
 }

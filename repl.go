@@ -19,7 +19,10 @@ type cliCommand struct {
 type Config struct {
 	CurrentPage  int
 	runningCache *pokecache.Cache
+	arguments    []byte
 }
+
+var urlAPI = "https://pokeapi.co/api/v2/location-area/"
 
 func getCommands() map[string]cliCommand {
 	list := map[string]cliCommand{
@@ -44,9 +47,9 @@ func getCommands() map[string]cliCommand {
 			callback:    backPage,
 		},
 		"explore": {
-			name:		"explore",
+			name:        "explore",
 			description: "Explore the current area and display the current available pokemon",
-			callback: 	commandExplore,
+			callback:    commandExplore,
 		},
 	}
 	return list
@@ -79,12 +82,11 @@ func commandHelp(config *Config) error {
 
 func commandMap(config *Config) error {
 	var err error
-	url := "https://pokeapi.co/api/v2/location-area/"
 
 	//Getting all the locations from the api/cache
 	for i := 1; i <= 20; i++ {
 		pageNum := ((config.CurrentPage - 1) * 20) + i
-		tmpurl := url + strconv.Itoa(pageNum) + "/"
+		tmpurl := urlAPI + strconv.Itoa(pageNum) + "/"
 		var res []byte
 		var found bool
 
@@ -118,5 +120,24 @@ func backPage(config *Config) error {
 }
 
 func commandExplore(config *Config) error {
+	tmpurl := urlAPI + string(config.arguments) + "/"
+	var res []byte
+	var found bool
+	var err error
+
+	//chech cache first for explore data
+	if res, found = config.runningCache.Get(tmpurl); !found {
+		//if not found get it from the api
+		res, err = pokeapi.ExploreLocation(tmpurl)
+		if err != nil {
+			return err
+		}
+		// and add it to the cache
+		config.runningCache.Add(tmpurl, res)
+	}
+	//need to print out the result
+	for _, name := range res {
+		fmt.Printf("%s", string(name))
+	}
 	return nil
 }
