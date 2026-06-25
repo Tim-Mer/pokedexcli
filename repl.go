@@ -51,6 +51,11 @@ func getCommands() map[string]cliCommand {
 			description: "Explore the current area and display the current available pokemon",
 			callback:    commandExplore,
 		},
+		"catch": {
+			name:        "catch",
+			description: "Attempt to catch a pokemon",
+			callback:    commandCatch,
+		},
 	}
 	return list
 }
@@ -139,5 +144,9 @@ func commandExplore(config *Config) error {
 	for _, name := range res {
 		fmt.Printf("%s", string(name))
 	}
+	return nil
+}
+
+func commandCatch(config *Config) error {
 	return nil
 }
