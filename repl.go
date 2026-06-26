@@ -22,7 +22,8 @@ type Config struct {
 	arguments    []byte
 }
 
-var urlAPI = "https://pokeapi.co/api/v2/location-area/"
+var urlLocationAPI = "https://pokeapi.co/api/v2/location-area/"
+var urlPokemonAPI = "https://pokeapi.co/api/v2/pokemon/"
 
 func getCommands() map[string]cliCommand {
 	list := map[string]cliCommand{
@@ -91,7 +92,7 @@ func commandMap(config *Config) error {
 	//Getting all the locations from the api/cache
 	for i := 1; i <= 20; i++ {
 		pageNum := ((config.CurrentPage - 1) * 20) + i
-		tmpurl := urlAPI + strconv.Itoa(pageNum) + "/"
+		tmpurl := urlLocationAPI + strconv.Itoa(pageNum) + "/"
 		var res []byte
 		var found bool
 
@@ -125,7 +126,7 @@ func backPage(config *Config) error {
 }
 
 func commandExplore(config *Config) error {
-	tmpurl := urlAPI + string(config.arguments) + "/"
+	tmpurl := urlLocationAPI + string(config.arguments) + "/"
 	var res []byte
 	var found bool
 	var err error
@@ -148,5 +149,6 @@ func commandExplore(config *Config) error {
 }
 
 func commandCatch(config *Config) error {
+	tmpurl := urlPokemonAPI + string(config.arguments) + "/"
 	return nil
 }
