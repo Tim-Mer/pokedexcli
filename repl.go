@@ -20,6 +20,7 @@ type Config struct {
 	CurrentPage  int
 	runningCache *pokecache.Cache
 	arguments    []byte
+	//pokedex map[string]Pokemon?
 }
 
 var urlLocationAPI = "https://pokeapi.co/api/v2/location-area/"
@@ -150,5 +151,12 @@ func commandExplore(config *Config) error {
 
 func commandCatch(config *Config) error {
 	tmpurl := urlPokemonAPI + string(config.arguments) + "/"
+	fmt.Printf("Throwing a ball at %s...\n", config.arguments)
+	pokemon, err := pokeapi.GetPokemonData(tmpurl)
+	if err != nil {
+		return err
+	}
+	level := pokemon.BaseExperience
+	fmt.Println(level)
 	return nil
 }
