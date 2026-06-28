@@ -15,6 +15,7 @@ func main() {
 	config := Config{
 		CurrentPage: 1,
 		runningCache: pokecache.NewCache(time.Second * 60),
+		catchHelper: 0,
 	}
 	configPtr := &config
 

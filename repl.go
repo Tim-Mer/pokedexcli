@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand/v2"
 	"os"
 	"strconv"
 	"strings"
@@ -20,7 +21,8 @@ type Config struct {
 	CurrentPage  int
 	runningCache *pokecache.Cache
 	arguments    []byte
-	//pokedex map[string]Pokemon?
+	pokedex      map[string]pokeapi.PokeData
+	catchHelper  int
 }
 
 var urlLocationAPI = "https://pokeapi.co/api/v2/location-area/"
@@ -150,13 +152,31 @@ func commandExplore(config *Config) error {
 }
 
 func commandCatch(config *Config) error {
-	tmpurl := urlPokemonAPI + string(config.arguments) + "/"
-	fmt.Printf("Throwing a ball at %s...\n", config.arguments)
+	tryCatch := string(config.arguments)
+	tmpurl := urlPokemonAPI + tryCatch + "/"
+	fmt.Printf("Throwing a Pokeball at %s...\n", config.arguments)
+	//Getting the data for the pokemon
 	pokemon, err := pokeapi.GetPokemonData(tmpurl)
 	if err != nil {
 		return err
 	}
+	// Checking if the pokedex is initialized
+	if config.pokedex == nil {
+		config.pokedex = make(map[string]pokeapi.PokeData)
+	}
+	// Getting the level and catch chance (with the rolling helper)
 	level := pokemon.BaseExperience
-	fmt.Println(level)
+	catchChance := rand.IntN(255) + 1 + config.catchHelper
+	// Checking if pokemon was caught
+	if catchChance > level {
+		fmt.Printf("%s was caught!\n", tryCatch)
+		//If yes, add it to the pokedex and reset the helper
+		config.pokedex[tryCatch] = pokemon
+		config.catchHelper = 0
+	} else {
+		fmt.Printf("%s escaped!\n", tryCatch)
+		// else add some help for the next attempt
+		config.catchHelper += int(catchChance / 2)
+	}
 	return nil
 }

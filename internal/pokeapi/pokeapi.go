@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-type mapData struct {
+type MapData struct {
 	ID                   int    `json:"id"`
 	Name                 string `json:"name"`
 	GameIndex            int    `json:"game_index"`
@@ -61,7 +61,7 @@ type mapData struct {
 	} `json:"pokemon_encounters"`
 }
 
-type pokeData struct {
+type PokeData struct {
 	Abilities []struct {
 		Ability struct {
 			Name string `json:"name"`
@@ -383,18 +383,18 @@ func getFromURL(url string) (string, error) {
 	return fmt.Sprintf("%s", body), nil
 }
 
-func getLocationDetails(url string) (mapData, error) {
+func getLocationDetails(url string) (MapData, error) {
 	// Call the Get
 	data, err := getFromURL(url)
 	if err != nil {
 		log.Fatal(err)
 	}
 	//do the unmarshaling
-	mapdata := mapData{}
+	mapdata := MapData{}
 	dat := []byte(data)
 	err = json.Unmarshal(dat, &mapdata)
 	if err != nil {
-		return mapData{}, err
+		return MapData{}, err
 	}
 	return mapdata, err
 }
@@ -420,26 +420,26 @@ func ExploreLocation(url string) ([]byte, error) {
 	return names, nil
 }
 
-func getPokemonDetails(url string) (pokeData, error) {
+func getPokemonDetails(url string) (PokeData, error) {
 	// Call the Get
 	data, err := getFromURL(url)
 	if err != nil {
 		log.Fatal(err)
 	}
 	//do the unmarshaling
-	pokedata := pokeData{}
+	pokedata := PokeData{}
 	dat := []byte(data)
 	err = json.Unmarshal(dat, &pokedata)
 	if err != nil {
-		return pokeData{}, err
+		return PokeData{}, err
 	}
 	return pokedata, err
 }
 
-func GetPokemonData(url string) (pokeData, error) {
+func GetPokemonData(url string) (PokeData, error) {
 	pokedata, err := getPokemonDetails(url)
 	if err != nil {
-		return pokeData{}, err
+		return PokeData{}, err
 	}
 	return pokedata, nil
 }
