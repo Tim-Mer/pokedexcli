@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"maps"
 	"math/rand/v2"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -59,6 +61,16 @@ func getCommands() map[string]cliCommand {
 			name:        "catch",
 			description: "Attempt to catch a pokemon",
 			callback:    commandCatch,
+		},
+		"inspect": {
+			name:        "inspect",
+			description: "Inspect any pokemon you've caught",
+			callback:    commandInspect,
+		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "list all current pokemon",
+			callback:    commandPokedex,
 		},
 	}
 	return list
@@ -177,6 +189,42 @@ func commandCatch(config *Config) error {
 		fmt.Printf("%s escaped!\n", tryCatch)
 		// else add some help for the next attempt
 		config.catchHelper += int(catchChance / 2)
+	}
+	return nil
+}
+
+func printPokemonDetails(pokemon pokeapi.PokeData) error {
+	fmt.Printf("Name: %s\nHeight: %d\nWeight: %d\nStats:\n", pokemon.Name, pokemon.Height, pokemon.Weight)
+	for _, stat := range pokemon.Stats {
+		fmt.Printf("- %s: %d\n", stat.Stat.Name, stat.BaseStat)
+	}
+	fmt.Printf("Types:\n")
+	for _, stat := range pokemon.Types {
+		fmt.Printf("- %s\n", stat.Type.Name)
+	}
+	return nil
+}
+
+func commandInspect(config *Config) error {
+	// Check if args passed
+	if config.arguments == nil {
+		//list available pokemon
+		fmt.Println("You have not selected a pokemon, you have the following available to inspect!")
+		return commandPokedex(config)
+	}
+	// Check if the pokemon is already caught
+	if pokemon, ok := config.pokedex[string(config.arguments)]; ok {
+		return printPokemonDetails(pokemon)
+	}
+	fmt.Printf("You have not caught %s\n", string(config.arguments))
+	return nil
+}
+
+func commandPokedex(config *Config) error {
+	//list available pokemon
+	fmt.Println("Current Pokemon: ")
+	for _, pokemon := range slices.Collect(maps.Keys(config.pokedex)) {
+		fmt.Printf(" - %s\n", pokemon)
 	}
 	return nil
 }
